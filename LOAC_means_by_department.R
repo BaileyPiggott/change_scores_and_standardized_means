@@ -2,7 +2,7 @@
 
 source("LOAC_CAT_paired.R")
 source("LOAC_CLA_paired.R")
-#source("LOAC_VALUE_paired.R")
+source("LOAC_VALUE_paired.R")
 
 # CALCULATE MEAN CHANGE SCORES -----------
 
@@ -98,26 +98,24 @@ std_eng_means <- data.frame(
   CLA = c(cla_mech_1, cla_elec_1, cla_cmpe_1, cla_civl_1, cla_chee_1, cla_ench_1, cla_mine_1, cla_geoe_1, cla_enph_1, cla_mthe_1,
     cla_mech_2, cla_elec_2, cla_cmpe_2, cla_civl_2, cla_chee_2, cla_ench_2, cla_mine_2, cla_geoe_2, cla_enph_2, cla_mthe_2)
   ) %>%
-  gather(test, change, CAT:CLA) 
+  gather(test, std_mean, CAT:CLA) 
 
-# CREATE PLOT ----------------------
+# CREATE PLOT FOR DEPARTMENTS ----------------------
 
 ggplot(data = std_means, 
   aes(x = test, y = change, fill = subject)
   ) +
   geom_bar(stat = "identity", position = "dodge", width = 0.6) +
-  geom_vline(
-    aes(xintercept = c(2.5, 4.5)),
-    colour = "grey"
-    ) +
-  coord_cartesian(ylim = c(-1.2, 0.6)) +
-  labs(title = "Standardized Mean per Year, by Department") +
+  geom_vline(aes(xintercept = c(2.5, 4.5)),colour = "grey") +
+  coord_cartesian(ylim = c(-1.3, 1)) +
+  labs(title = "Standardized Mean per Year, by Department", y = "Standardized Mean") +
   theme(
     panel.border = element_rect(colour = "grey", fill = NA), #add border around graph
     panel.background = element_rect("white"), #change background colour
     panel.grid.major.x = element_blank(), # remove vertical lines
     panel.grid.major.y = element_line(colour = "grey"),
     axis.ticks.x = element_blank(),
+    axis.title.x = element_blank(),
     axis.text.x = element_blank(),
     plot.title = element_text(size = 15),
     axis.title = element_text(size = 14),
@@ -125,27 +123,32 @@ ggplot(data = std_means,
   ) +
   annotate(
     "text", 
-    x = c(1.5, 3.5, 5.5), 
-    y = -1.01, 
-    vjust = 1,
-    label = c("CAT\nYear 1    Year 2", "CLA\nYear 1    Year 2", "VALUE\nYear 1    Year 2")
-    )
+    x = c(1.5, 3.5, 5.5, 1, 2, 3, 4, 5, 6), 
+    y = c(-1.05,-1.05, -1.05, -1.15, -1.15, -1.15, -1.15, -1.15, -1.15),
+    size = 4.5,
+    vjust = 1, 
+    label = c("CAT", "CLA", "VALUE", "Year 1", "Year 2", "Year 1", "Year 2", "Year 1", "Year 2")
+    )  
 
 # ENGINEERING PLOT -------------------
 ggplot(data = std_eng_means, 
-       aes(x = discipline, y = change, fill = factor(year))) +
+       aes(x = discipline, y = std_mean, fill = factor(year))) +
   geom_bar(stat = "identity", position = "dodge", width = 0.4) +
   facet_grid(test~.) + #separate vertically
-  coord_cartesian(ylim = c(-0.7, 0.7)) +
-  labs(title = "Standardized Mean per Year, by Department") +
+  coord_cartesian(ylim = c(-0.6, 0.6)) +
+  labs(title = "Standardized Mean per Year, by Discipline", x = "Engineering Discipline", y = "Standardized Mean") +
   theme(
     panel.border = element_rect(colour = "grey", fill = NA), #add border around graph
     panel.background = element_rect("white"), #change background colour
     panel.grid.major.x = element_blank(), # remove vertical lines
     panel.grid.major.y = element_line(colour = "grey"),
     axis.ticks.x = element_blank(),
+    legend.title = element_blank(),
     plot.title = element_text(size = 15),
     axis.title = element_text(size = 14),
     axis.text = element_text(size = 11), #size of x axis labels
     strip.text.y = element_text(size = 12, face = "bold") # facet text
+    ) +
+  scale_fill_discrete(
+    labels = c("First Year", "Second Year")
     )
