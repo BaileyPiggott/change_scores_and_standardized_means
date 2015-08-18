@@ -47,7 +47,7 @@ sample_sizes <- c(paste0("CHEE\nn=", nrow(cat_chee), "  n=", nrow(cla_chee)),
 ggplot(data = eng_disp_change, 
   aes(x = discipline, y = change, fill = test)
   ) +
-  geom_bar(stat = "identity", position = "dodge", width = 0.6) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.45) +
   coord_cartesian(ylim = c(-0.8, 0.8)) +
   scale_x_discrete(labels = sample_sizes) +
   labs(title = "Standardized Change Scores Year 1-Year 2") +
@@ -59,4 +59,7 @@ ggplot(data = eng_disp_change,
     plot.title = element_text(size = 15),
     axis.title = element_text(size = 14),
     axis.text = element_text(size = 11) #size of x axis labels
-  ) 
+  ) +
+  scale_fill_manual(
+    values = c("tomato", "steelblue")
+    )

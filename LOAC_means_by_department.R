@@ -1,5 +1,7 @@
 # LOAC mean scores by department
 
+library(grid)
+
 source("LOAC_CAT_paired.R")
 source("LOAC_CLA_paired.R")
 source("LOAC_VALUE_paired.R")
@@ -71,11 +73,11 @@ ggplot(data = std_means,
 std_means <- std_means %>% 
   separate(test, into = c("test", "year"), sep = "_")
 
-
-ggplot(data = std_means, aes(x = subject, y = std_mean, fill = year)) +
+ggplot(data = std_means, aes(x = subject, y = std_mean, fill = factor(year))) +
   geom_bar(stat = "identity", position = "dodge", width = 0.4) +
   facet_grid(~test) +
   coord_cartesian(ylim = c(-1, 1)) +
+  #scale_x_discrete(labels = c("Year 1", "Year 2")) +
   labs(title = "Standardized Mean per Year, by Department", x = "Department", y = "Standardized Mean") +
   theme(
     panel.border = element_rect(colour = "grey", fill = NA), #add border around graph
@@ -83,13 +85,18 @@ ggplot(data = std_means, aes(x = subject, y = std_mean, fill = year)) +
     panel.grid.major.x = element_blank(), # remove vertical lines
     panel.grid.major.y = element_line(colour = "grey"),
     axis.ticks.x = element_blank(),
+    axis.title.x = element_blank(),
     legend.title = element_blank(),
     plot.title = element_text(size = 15),
     axis.title = element_text(size = 14),
     axis.text = element_text(size = 11), #size of x axis labels
     strip.text = element_text(size = 12, face = "bold") # facet text
     ) +
-  scale_fill_discrete(labels = c("First Year", "Second Year")) # legend key labels
+  scale_fill_discrete(
+    labels = c("First Year", "Second Year")#,
+    #labels = c("Engineering", "Drama", "Psychology"),
+    #values = c("tomato", "steelblue")
+    ) # legend key labels
 
 
 
@@ -152,15 +159,19 @@ std_eng_means <- data.frame(
   discipline = c("MECH", "ELEC", "CMPE", "CIVL", "CHEE", "ENCH", "MINE", "GEOE", "ENPH", "MTHE"),        
   year = c(1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2),
   CAT = c(cat_mech_1, cat_elec_1, cat_cmpe_1, cat_civl_1, cat_chee_1, cat_ench_1, cat_mine_1, cat_geoe_1, cat_enph_1, cat_mthe_1,
-          cat_mech_2, cat_elec_2, cat_cmpe_2, cat_civl_2, cat_chee_2, cat_ench_2, cat_mine_2, cat_geoe_2, cat_enph_2, cat_mthe_2),
+            cat_mech_2, cat_elec_2, cat_cmpe_2, cat_civl_2, cat_chee_2, cat_ench_2, cat_mine_2, cat_geoe_2, cat_enph_2, cat_mthe_2),
   CLA = c(cla_mech_1, cla_elec_1, cla_cmpe_1, cla_civl_1, cla_chee_1, cla_ench_1, cla_mine_1, cla_geoe_1, cla_enph_1, cla_mthe_1,
           cla_mech_2, cla_elec_2, cla_cmpe_2, cla_civl_2, cla_chee_2, cla_ench_2, cla_mine_2, cla_geoe_2, cla_enph_2, cla_mthe_2)
-) %>%
-  gather(test, std_mean, CAT:CLA) 
+  ) %>%
+  gather(test, std_mean, CAT:CLA) %>%
+  mutate(Test = test) %>%
+  unite(fill_colours, Test, year, sep = "_")
+
+std_eng_means$fill_colours <- factor(std_eng_means$fill_colours, levels = c("CAT_1", "CLA_1", "CAT_2", "CLA_2"))
 
 # ENGINEERING PLOT -------------------
 ggplot(data = std_eng_means, 
-       aes(x = discipline, y = std_mean, fill = factor(year))) +
+       aes(x = discipline, y = std_mean, fill = fill_colours)) +
   geom_bar(stat = "identity", position = "dodge", width = 0.4) +
   facet_grid(test~.) + #separate vertically
   coord_cartesian(ylim = c(-0.6, 0.6)) +
@@ -171,12 +182,17 @@ ggplot(data = std_eng_means,
     panel.grid.major.x = element_blank(), # remove vertical lines
     panel.grid.major.y = element_line(colour = "grey"),
     axis.ticks.x = element_blank(),
-    legend.title = element_blank(),
+    legend.title.align = 0.5,
+    legend.key.height = unit(0.15, "inches"),
+    legend.text.align = 0.5, # center text
     plot.title = element_text(size = 15),
     axis.title = element_text(size = 14),
     axis.text = element_text(size = 11), #size of x axis labels
     strip.text.y = element_text(size = 12, face = "bold") # facet text
   ) +
-  scale_fill_discrete(
-    labels = c("First Year", "Second Year")
-  )
+  scale_fill_manual(
+    name = "Legend",
+    labels = c("First","Year", "Second","Year"),
+    values = c("tomato","steelblue2", "tomato4", "steelblue4")
+  )+
+  guides(fill=guide_legend(ncol=2))# multiple columns in legend
