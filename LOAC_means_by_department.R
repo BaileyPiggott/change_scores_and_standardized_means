@@ -38,46 +38,16 @@ std_means <- data.frame(
   ) %>%
   gather(test, std_mean, -subject)# convert to long form
 
-# CREATE PLOT FOR DEPARTMENTS ----------------------
-
-ggplot(data = std_means, 
-  aes(x = test, y =std_mean, fill = subject)
-  ) +
-  geom_bar(stat = "identity", position = "dodge", width = 0.6) +
-  geom_vline(aes(xintercept = c(2.5, 4.5)),colour = "grey") +
-  coord_cartesian(ylim = c(-1.3, 1)) +
-  labs(title = "Standardized Mean per Year, by Department", y = "Standardized Mean") +
-  theme(
-    panel.border = element_rect(colour = "grey", fill = NA), #add border around graph
-    panel.background = element_rect("white"), #change background colour
-    panel.grid.major.x = element_blank(), # remove vertical lines
-    panel.grid.major.y = element_line(colour = "grey"),
-    axis.ticks.x = element_blank(),
-    axis.title.x = element_blank(),
-    axis.text.x = element_blank(),
-    plot.title = element_text(size = 15),
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 11) #size of x axis labels
-  ) +
-  annotate(
-    "text", 
-    x = c(1.5, 3.5, 5.5, 1, 2, 3, 4, 5, 6), 
-    y = c(-1.05,-1.05, -1.05, -1.15, -1.15, -1.15, -1.15, -1.15, -1.15),
-    size = 4.5,
-    vjust = 1, 
-    label = c("CAT", "CLA", "VALUE", "Year 1", "Year 2", "Year 1", "Year 2", "Year 1", "Year 2")
-    )  
-
-# DEPARTMENTAL FACET PLOT -------------------
-
 std_means <- std_means %>% 
   separate(test, into = c("test", "year"), sep = "_")
 
-ggplot(data = std_means, aes(x = subject, y = std_mean, fill = factor(year))) +
+# DEPARTMENTAL FACET PLOT -------------------
+
+ggplot(data = std_means, aes(x = factor(year), y = std_mean, fill = subject)) +
   geom_bar(stat = "identity", position = "dodge", width = 0.4) +
   facet_grid(~test) +
   coord_cartesian(ylim = c(-1, 1)) +
-  #scale_x_discrete(labels = c("Year 1", "Year 2")) +
+  scale_x_discrete(labels = c("Year 1", "Year 2")) +
   labs(title = "Standardized Mean per Year, by Department", x = "Department", y = "Standardized Mean") +
   theme(
     panel.border = element_rect(colour = "grey", fill = NA), #add border around graph
@@ -93,8 +63,7 @@ ggplot(data = std_means, aes(x = subject, y = std_mean, fill = factor(year))) +
     strip.text = element_text(size = 12, face = "bold") # facet text
     ) +
   scale_fill_discrete(
-    labels = c("First Year", "Second Year")#,
-    #labels = c("Engineering", "Drama", "Psychology"),
+    labels = c("Engineering", "Drama", "Psychology")#,
     #values = c("tomato", "steelblue")
     ) # legend key labels
 
@@ -169,7 +138,7 @@ std_eng_means <- data.frame(
 
 std_eng_means$fill_colours <- factor(std_eng_means$fill_colours, levels = c("CAT_1", "CLA_1", "CAT_2", "CLA_2"))
 
-# ENGINEERING PLOT -------------------
+# ENGINEERING PLOT of CLA and CAT Change -------------------
 ggplot(data = std_eng_means, 
        aes(x = discipline, y = std_mean, fill = fill_colours)) +
   geom_bar(stat = "identity", position = "dodge", width = 0.4) +
